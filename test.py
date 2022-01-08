@@ -5,6 +5,7 @@ import pytz
 import secrets
 import requests
 import json
+from extract import json_extract
 
 debug = False
 
@@ -32,16 +33,13 @@ def GetWeather(latitude, longitude, detailed):
     response = requests.get(url)
     data = json.loads(response.text)
     returnData = []
-    for detail in data["weather"]:
-        returnData.append(detail["description"])
+    returnData.append(json_extract(data, "description"))
     if detailed == True:
-        for detail in data["main"]:
-            returnData.append(detail["temp"])
-        for detail in data["wind"]:
-            returnData.append(detail["speed"], detail["deg"])
-        for detail in data["sys"]:
-            returnData.append(detail["sunrise"], detail["sunset"])
-    debugPrint(returnData)
+        returnData.append(json_extract(data, "temp"))
+        returnData.append(json_extract(data, "speed"))
+        returnData.append(json_extract(data, "sunrise"))
+        returnData.append(json_extract(data, "sunset"))
+
     return returnData
 
 def TimeAndWeather(locationString, detailed):
