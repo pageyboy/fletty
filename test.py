@@ -6,34 +6,54 @@ import secrets
 import requests
 import json
 
+debug = False
+
+def debugPrint(message):
+    if debug == True:
+        print(message)
+
 def GetLatLong(locationString):
     geolocator = Nominatim(user_agent="geoapiExercises")
-    print("Location Address:", locationString)
+    debugPrint("Location Address:" + locationString)
     location = geolocator.geocode(locationString)
-    print("Long,Lat:", location.latitude, location.longitude)
+    debugPrint("Long,Lat:" + str(location.latitude) + " " + str(location.longitude))
     return [location.latitude, location.longitude]
 
 def GetTime(latitude, longitude):
     obj = TimezoneFinder()
     result = obj.timezone_at(lat=latitude, lng=longitude)
-    print("Timezone:",result)
+    debugPrint("Timezone:" + str(result))
     IST = pytz.timezone(result)
-    print("Current Time:", datetime.now(IST))
+    debugPrint("Current Time:" + str(datetime.now(IST)))
+    return datetime.now(IST)
 
-def GetWeather(latitude, longitude):
+def GetWeather(latitude, longitude, detailed):
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid={secrets.WEATHER_API}"
     response = requests.get(url)
     data = json.loads(response.text)
-    for doc in data["weather"]:
-        print(doc['description'])
+    returnData = []
+    for detail in data["weather"]:
+        returnData.append(detail["description"])
+    if detailed == True:
+        for detail in data["main"]:
+            returnData.append(detail["temp"])
+        for detail in data["wind"]:
+            returnData.append(detail["speed"], detail["deg"])
+        for detail in data["sys"]:
+            returnData.append(detail["sunrise"], detail["sunset"])
+    debugPrint(returnData)
+    return returnData
 
-def TimeAndWeather(locationString):
+def TimeAndWeather(locationString, detailed):
     locLatLong = GetLatLong(locationString)
     locTime = GetTime(locLatLong[0], locLatLong[1])
-    locWeather = GetWeather(locLatLong[0], locLatLong[1])
+    locWeather = GetWeather(locLatLong[0], locLatLong[1], detailed)
     return locTime, locWeather
 
 locations = ["Middlewich, UK", "Colorado Springs, Colorado", "Tokyo, Japan", "Melbourne, Australia", "Cupertino, California", "India"]
 for location in locations:
-    locTimeWeather = TimeAndWeather(location)
-    print(locTimeWeather[0], locTimeWeather[1])
+    locTimeWeather = TimeAndWeather(location, True)
+    print(location)
+    print(locTimeWeather[0])
+    print(locTimeWeather[1])
+    print("")
