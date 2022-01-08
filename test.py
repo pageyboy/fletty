@@ -2,6 +2,9 @@ from timezonefinder import TimezoneFinder
 from geopy.geocoders import Nominatim
 from datetime import datetime
 import pytz
+import secrets
+import requests
+import json
 
 def TimeAndWeather(locationString):
     geolocator = Nominatim(user_agent="geoapiExercises")
@@ -13,6 +16,10 @@ def TimeAndWeather(locationString):
     print("Timezone:",result)
     IST = pytz.timezone(result)
     print("Current Time:", datetime.now(IST))
+    url = f"https://api.openweathermap.org/data/2.5/weather?lat={location.latitude}&lon={location.longitude}&units=metric&appid={secrets.WEATHER_API}"
+    response = requests.get(url)
+    data = json.loads(response.text)
+    print(data)
     print("")
 
 
