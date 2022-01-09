@@ -40,7 +40,7 @@ def GetWeather(latitude, longitude, detailed):
         returnData.append(json_extract(data, "sunrise"))
         returnData.append(json_extract(data, "sunset"))
 
-    return {"weather": returnData}
+    return returnData
 
 def TimeAndWeather(locationString, detailed):
     locLatLong = GetLatLong(locationString)
@@ -48,7 +48,7 @@ def TimeAndWeather(locationString, detailed):
     locWeather = GetWeather(locLatLong[0], locLatLong[1], detailed)
     return locTime, locWeather
 
-def GetData():
+def GetData(locations):
     dataList = []
     dataDict = {}
     for location in locations:
@@ -57,9 +57,11 @@ def GetData():
         dataDict["time"] = locTimeWeather[0]
         dataDict["weather"] = locTimeWeather[1]
         dataList.append(dataDict)
+        dataDict = {}
         debugPrint(location)
         debugPrint(locTimeWeather[0])
         debugPrint(locTimeWeather[1])
         debugPrint("")
     returnData = {}
     returnData["locations"] = dataList
+    return(returnData)
