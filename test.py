@@ -1,3 +1,6 @@
+from flask import Flask
+from datetime import datetime
+from waitress import serve
 from timezonefinder import TimezoneFinder
 from geopy.geocoders import Nominatim
 from datetime import datetime
@@ -8,6 +11,7 @@ import json
 from extract import json_extract
 
 debug = False
+locations = ["Middlewich, UK", "Colorado Springs, Colorado", "Tokyo, Japan", "Melbourne, Australia", "Cupertino, California", "India"]
 
 def debugPrint(message):
     if debug == True:
@@ -48,10 +52,15 @@ def TimeAndWeather(locationString, detailed):
     locWeather = GetWeather(locLatLong[0], locLatLong[1], detailed)
     return locTime, locWeather
 
-locations = ["Middlewich, UK", "Colorado Springs, Colorado", "Tokyo, Japan", "Melbourne, Australia", "Cupertino, California", "India"]
-for location in locations:
-    locTimeWeather = TimeAndWeather(location, True)
-    print(location)
-    print(locTimeWeather[0])
-    print(locTimeWeather[1])
-    print("")
+def GetData():
+    returnData = []
+    for location in locations:
+        locTimeWeather = TimeAndWeather(location, True)
+        returnData.append([location,locTimeWeather[0],locTimeWeather[1]])
+        debugPrint(location)
+        debugPrint(locTimeWeather[0])
+        debugPrint(locTimeWeather[1])
+        debugPrint("")
+    return returnData
+
+print(GetData())
