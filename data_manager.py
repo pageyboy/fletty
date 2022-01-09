@@ -20,15 +20,22 @@ def GetLatLong(locationString):
     debugPrint("Long,Lat:" + str(location.latitude) + " " + str(location.longitude))
     return [location.latitude, location.longitude]
 
+def formatTime(date, epoch, timezone):
+    if epoch:
+        date = datetime.fromtimestamp(date, tz=timezone)
+    date = f"{date.hour:02d}" + ":" + f"{date.minute:02d}"
+    return date
+
 def GetTime(latitude, longitude):
     obj = TimezoneFinder()
     result = obj.timezone_at(lat=latitude, lng=longitude)
     debugPrint("Timezone:" + str(result))
-    IST = pytz.timezone(result)
-    debugPrint("Current Time:" + str(datetime.now(IST)))
-    return datetime.now(IST)
+    tz = pytz.timezone(result)
+    date = formatTime(datetime.now(tz), False, None)
+    debugPrint("Current Time:" + date)
+    return date, tz
 
-def GetWeather(latitude, longitude, detailed):
+def GetWeather(latitude, longitude, detailed, tz):
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid={secrets.WEATHER_API}"
     response = requests.get(url)
     data = json.loads(response.text)
@@ -37,16 +44,19 @@ def GetWeather(latitude, longitude, detailed):
     if detailed == True:
         returnData["temp"] = json_extract(data, "temp")[0]
         returnData["windspeed"] = json_extract(data, "speed")[0]
-        returnData["sunrise"] = json_extract(data, "sunrise")[0]
-        returnData["sunset"] = json_extract(data, "sunset")[0]
+        returnData["sunrise"] = formatTime(json_extract(data, "sunrise")[0], True, tz)
+        returnData["sunset"] = formatTime(json_extract(data, "sunset")[0], True, tz)
+        returnData["min_temp"] = json_extract(data, "temp_min")[0]
+        returnData["max_temp"] = json_extract(data, "temp_max")[0]
+        returnData["humidity"] = json_extract(data, "humidity")[0]
 
     return returnData
 
 def TimeAndWeather(locationString, detailed):
     locLatLong = GetLatLong(locationString)
     locTime = GetTime(locLatLong[0], locLatLong[1])
-    locWeather = GetWeather(locLatLong[0], locLatLong[1], detailed)
-    return locTime, locWeather
+    locWeather = GetWeather(locLatLong[0], locLatLong[1], detailed, locTime[1])
+    return locTime[0], locWeather
 
 def GetData(locations):
     dataList = []
