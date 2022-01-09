@@ -32,13 +32,13 @@ def GetWeather(latitude, longitude, detailed):
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid={secrets.WEATHER_API}"
     response = requests.get(url)
     data = json.loads(response.text)
-    returnData = []
-    returnData.append(json_extract(data, "description"))
+    returnData = {}
+    returnData["description"] = json_extract(data, "description")[0]
     if detailed == True:
-        returnData.append(json_extract(data, "temp"))
-        returnData.append(json_extract(data, "speed"))
-        returnData.append(json_extract(data, "sunrise"))
-        returnData.append(json_extract(data, "sunset"))
+        returnData["temp"] = json_extract(data, "temp")[0]
+        returnData["windspeed"] = json_extract(data, "speed")[0]
+        returnData["sunrise"] = json_extract(data, "sunrise")[0]
+        returnData["sunset"] = json_extract(data, "sunset")[0]
 
     return returnData
 
