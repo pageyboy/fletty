@@ -55,12 +55,14 @@ def TimeAndWeather(locationString, detailed):
     return locTime, locWeather
 
 def GetData():
-    returnData = []
+    dataList = []
+    dataDict = {}
     for location in locations:
         locTimeWeather = TimeAndWeather(location, True)
-        returnData["location"].append(location)
-        returnData["time"].append(locTimeWeather[0])
-        returnData["weather"].append(locTimeWeather[1])
+        dataDict["location"] = location
+        dataDict["time"] = locTimeWeather[0]
+        dataDict["weather"] = locTimeWeather[1]
+        dataList.append(dataDict)
         debugPrint(location)
         debugPrint(locTimeWeather[0])
         debugPrint(locTimeWeather[1])
