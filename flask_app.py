@@ -9,7 +9,7 @@ locations = ["Middlewich, UK", "Colorado Springs, Colorado", "Tokyo, Japan", "Me
 app = Flask(__name__)
 
 @app.route("/")
-def main():
+def home():
     data = GetData(locations)
     return data
 
